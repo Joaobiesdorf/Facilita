@@ -42,6 +42,9 @@ require_once "includes/header.php";
             <button type="submit" class="btn btn-primary btn-block">Entrar</button>
         </form>
         
+        <p class="text-center mt-1" style="margin-bottom: 0.5rem;">
+            <a href="forgot_password.php" style="color: var(--primary)">Esqueci minha senha</a>
+        </p>
         <p class="text-center mt-1">
             Novo por aqui? <a href="register.php" style="color: var(--primary)">Crie sua conta</a>
         </p>

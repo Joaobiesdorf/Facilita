@@ -14,7 +14,7 @@ $filter_distance = $_GET['distance'] ?? '';
 $filter_budget = $_GET['budget'] ?? '';
 
 // Fetch only OPEN services without a provider assigned yet
-$sql = "SELECT s.*, u.nome as client_name FROM services s JOIN users u ON s.client_id = u.id WHERE s.status = 'Aberta' AND s.provider_id IS NULL";
+$sql = "SELECT s.*, u.nome as client_name, u.profile_picture as client_picture FROM services s JOIN users u ON s.client_id = u.id WHERE s.status = 'Aberta' AND s.provider_id IS NULL";
 $params = [];
 
 if ($filter_budget !== '') {
@@ -84,7 +84,16 @@ foreach ($services as $s) {
                     <h3 class="data-card-title"><?= htmlspecialchars($s['title']) ?></h3>
                     <span class="badge badge-success">Aberta</span>
                 </div>
-                <p style="color: var(--secondary); font-size: 0.9rem;"><strong>Cliente:</strong> <?= htmlspecialchars($s['client_name']) ?></p>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                    <?php if (!empty($s['client_picture'])): ?>
+                        <img src="uploads/profile_pictures/<?= htmlspecialchars($s['client_picture']) ?>" alt="" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+                    <?php else: ?>
+                        <div style="width: 30px; height: 30px; border-radius: 50%; background: var(--secondary); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: bold;">
+                            <?= strtoupper(substr($s['client_name'], 0, 1)) ?>
+                        </div>
+                    <?php endif; ?>
+                    <p style="color: var(--secondary); font-size: 0.9rem; margin: 0;"><strong>Cliente:</strong> <?= htmlspecialchars($s['client_name']) ?></p>
+                </div>
                 <p class="data-card-subtitle mt-1" style="flex:1;"><?= htmlspecialchars($s['description']) ?></p>
                 
                 <div class="mt-1" style="font-size: 0.9rem;">

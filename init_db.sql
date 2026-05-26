@@ -1,6 +1,12 @@
 CREATE DATABASE IF NOT EXISTS facilita CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE facilita;
 
+-- Drop tables if they exist to recreate with proper charset
+DROP TABLE IF EXISTS reviews;
+DROP TABLE IF EXISTS services;
+DROP TABLE IF EXISTS provider_profiles;
+DROP TABLE IF EXISTS users;
+
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -8,8 +14,11 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
     role ENUM('client', 'provider') NOT NULL,
+    profile_picture VARCHAR(255) DEFAULT NULL,
+    reset_token VARCHAR(255) DEFAULT NULL,
+    reset_expires DATETIME DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Provider profiles
 CREATE TABLE IF NOT EXISTS provider_profiles (
@@ -23,7 +32,7 @@ CREATE TABLE IF NOT EXISTS provider_profiles (
     lat DECIMAL(10, 6) DEFAULT 0.000000,
     lng DECIMAL(10, 6) DEFAULT 0.000000,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Services
 CREATE TABLE IF NOT EXISTS services (
@@ -41,7 +50,7 @@ CREATE TABLE IF NOT EXISTS services (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (client_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (provider_id) REFERENCES users(id) ON DELETE SET NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Reviews
 CREATE TABLE IF NOT EXISTS reviews (
@@ -55,13 +64,9 @@ CREATE TABLE IF NOT EXISTS reviews (
     FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE,
     FOREIGN KEY (reviewer_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (provider_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Clear old data if exists
-DELETE FROM reviews;
-DELETE FROM services;
-DELETE FROM provider_profiles;
-DELETE FROM users;
+-- (Moved to top)
 
 -- Seed Data: Users
 -- Passwords are '123456' hashed with password_hash('123456', PASSWORD_DEFAULT)

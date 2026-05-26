@@ -14,8 +14,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error = "E-mail já cadastrado!";
     } else {
         $hashed_password = password_hash($senha, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("INSERT INTO users (nome, email, senha, role) VALUES (?, ?, ?, ?)");
-        if ($stmt->execute([$nome, $email, $hashed_password, $role])) {
+        
+        $profile_picture = null;
+        if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+            $upload_dir = 'uploads/profile_pictures/';
+            $filename = uniqid() . '_' . basename($_FILES['profile_picture']['name']);
+            $target_file = $upload_dir . $filename;
+            if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $target_file)) {
+                $profile_picture = $filename;
+            }
+        }
+        
+        $stmt = $pdo->prepare("INSERT INTO users (nome, email, senha, role, profile_picture) VALUES (?, ?, ?, ?, ?)");
+        if ($stmt->execute([$nome, $email, $hashed_password, $role, $profile_picture])) {
             $user_id = $pdo->lastInsertId();
             
             if ($role === 'provider') {
@@ -50,7 +61,7 @@ require_once "includes/header.php";
             <div style="color: var(--danger); margin-bottom: 1rem; text-align: center; font-weight: bold;"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
-        <form method="POST" id="registerForm">
+        <form method="POST" id="registerForm" enctype="multipart/form-data">
             <div class="form-group">
                 <label>Eu quero...</label>
                 <select name="role" id="roleSelect" class="form-control" onchange="toggleProviderFields()">
@@ -72,6 +83,11 @@ require_once "includes/header.php";
             <div class="form-group">
                 <label>Senha</label>
                 <input type="password" name="senha" class="form-control" required minlength="6">
+            </div>
+
+            <div class="form-group">
+                <label>Foto de Perfil (Opcional)</label>
+                <input type="file" name="profile_picture" class="form-control" accept="image/*">
             </div>
 
             <!-- Provider Only Fields -->

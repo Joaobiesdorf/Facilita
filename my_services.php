@@ -1,6 +1,5 @@
 <?php
 require_once "includes/db.php";
-session_start();
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -56,8 +55,11 @@ require_once "includes/header.php";
             </div>
             
             <div style="flex: 1; text-align: right; display: flex; flex-direction: column; gap: 0.5rem;">
+                <?php if ($s['status'] !== 'Aberta' && $s['status'] !== 'Finalizado'): ?>
+                    <a href="update_status.php?id=<?= $s['id'] ?>&action=prev" class="btn btn-outline btn-sm" style="margin-bottom: 0.5rem; border-color: var(--warning); color: var(--warning);">Retornar Status</a>
+                <?php endif; ?>
                 <?php if ($s['status'] !== 'Finalizado'): ?>
-                    <a href="update_status.php?id=<?= $s['id'] ?>" class="btn btn-outline btn-sm">Avançar Status</a>
+                    <a href="update_status.php?id=<?= $s['id'] ?>&action=next" class="btn btn-outline btn-sm">Avançar Status</a>
                 <?php endif; ?>
                 
                 <?php if ($s['status'] === 'Finalizado' && $role === 'client' && $s['provider_id']): ?>

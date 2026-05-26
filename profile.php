@@ -2,8 +2,6 @@
 require_once "includes/db.php";
 require_once "includes/functions.php";
 
-session_start();
-
 $provider_id = $_GET['id'] ?? null;
 if (!$provider_id) {
     die("Profissional não especificado.");
@@ -11,7 +9,7 @@ if (!$provider_id) {
 
 // Fetch provider details
 $stmt = $pdo->prepare("
-    SELECT p.*, u.nome, u.email 
+    SELECT p.*, u.nome, u.email, u.profile_picture 
     FROM provider_profiles p 
     JOIN users u ON p.user_id = u.id 
     WHERE u.id = ? AND u.role = 'provider'
@@ -72,8 +70,19 @@ require_once "includes/header.php";
 <div class="grid grid-cols-2 gap-1 mb-2">
     <div>
         <div class="data-card">
-            <h2><?= htmlspecialchars($provider['nome']) ?></h2>
-            <p class="text-muted" style="font-size: 1.1rem; margin-bottom: 1rem;"><?= htmlspecialchars($provider['specialty']) ?></p>
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                <?php if (!empty($provider['profile_picture'])): ?>
+                    <img src="uploads/profile_pictures/<?= htmlspecialchars($provider['profile_picture']) ?>" alt="Foto de Perfil" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
+                <?php else: ?>
+                    <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; border: 2px solid var(--primary);">
+                        <?= strtoupper(substr($provider['nome'], 0, 1)) ?>
+                    </div>
+                <?php endif; ?>
+                <div>
+                    <h2 style="margin: 0;"><?= htmlspecialchars($provider['nome']) ?></h2>
+                    <p class="text-muted" style="font-size: 1.1rem; margin: 0;"><?= htmlspecialchars($provider['specialty']) ?></p>
+                </div>
+            </div>
             
             <p><strong>Bio:</strong><br><?= nl2br(htmlspecialchars($provider['bio'])) ?></p>
             <div class="mt-1">
@@ -103,14 +112,19 @@ require_once "includes/header.php";
                     <h4>Deixe sua avaliação</h4>
                     <form method="POST">
                         <div class="form-group mb-1 mt-1">
-                            <label>Nota (1 a 5):</label>
-                            <select name="rating" class="form-control" style="width: 100px;">
-                                <option value="5">5 Estrelas</option>
-                                <option value="4">4 Estrelas</option>
-                                <option value="3">3 Estrelas</option>
-                                <option value="2">2 Estrelas</option>
-                                <option value="1">1 Estrela</option>
-                            </select>
+                            <label style="margin-bottom: 0.5rem; display: block;">Nota (1 a 5):</label>
+                            <div class="star-rating">
+                                <input type="radio" id="star5" name="rating" value="5" required />
+                                <label for="star5" title="5 estrelas">★</label>
+                                <input type="radio" id="star4" name="rating" value="4" />
+                                <label for="star4" title="4 estrelas">★</label>
+                                <input type="radio" id="star3" name="rating" value="3" />
+                                <label for="star3" title="3 estrelas">★</label>
+                                <input type="radio" id="star2" name="rating" value="2" />
+                                <label for="star2" title="2 estrelas">★</label>
+                                <input type="radio" id="star1" name="rating" value="1" />
+                                <label for="star1" title="1 estrela">★</label>
+                            </div>
                         </div>
                         <div class="form-group mb-1">
                             <label>Comentário:</label>

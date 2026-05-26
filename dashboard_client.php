@@ -11,7 +11,7 @@ $filter_rating = $_GET['rating'] ?? '';
 $filter_price = $_GET['price'] ?? '';
 $filter_team = $_GET['team_size'] ?? '';
 
-$sql = "SELECT p.*, u.nome FROM provider_profiles p JOIN users u ON p.user_id = u.id WHERE 1=1";
+$sql = "SELECT p.*, u.nome, u.profile_picture FROM provider_profiles p JOIN users u ON p.user_id = u.id WHERE 1=1";
 $params = [];
 
 if ($filter_team !== '') {
@@ -93,9 +93,20 @@ foreach ($providers as $p) {
     <div class="grid grid-cols-4">
         <?php foreach ($filtered_providers as $p): ?>
             <div class="data-card">
-                <div class="data-card-header">
-                    <h3 class="data-card-title"><?= htmlspecialchars($p['nome']) ?></h3>
-                    <span class="badge badge-primary"><?= htmlspecialchars($p['team_size']) ?></span>
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                    <?php if (!empty($p['profile_picture'])): ?>
+                        <img src="uploads/profile_pictures/<?= htmlspecialchars($p['profile_picture']) ?>" alt="" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
+                    <?php else: ?>
+                        <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: bold; border: 2px solid var(--primary);">
+                            <?= strtoupper(substr($p['nome'], 0, 1)) ?>
+                        </div>
+                    <?php endif; ?>
+                    <div style="flex: 1;">
+                        <div class="data-card-header" style="margin-bottom: 0;">
+                            <h3 class="data-card-title" style="margin-bottom: 0;"><?= htmlspecialchars($p['nome']) ?></h3>
+                            <span class="badge badge-primary"><?= htmlspecialchars($p['team_size']) ?></span>
+                        </div>
+                    </div>
                 </div>
                 <p style="color: var(--secondary); font-weight: 600;"><?= htmlspecialchars($p['specialty']) ?></p>
                 <p class="data-card-subtitle mt-1" style="flex:1;"><?= htmlspecialchars($p['bio']) ?></p>
